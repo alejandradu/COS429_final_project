@@ -1,1 +1,3 @@
 depthai_movement requires a specific device to run on BUT they have a yoga pose estimator class
+- uninstalling from our repo to avoid too many dependencies, but url:
+  

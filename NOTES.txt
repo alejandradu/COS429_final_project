@@ -1,0 +1,16 @@
+OUTLINE - functions/files
+
+- DATA
+1. Image dataset of different yoga positions (png, jpg)
+FIRST: extract keypoints (N) as x, y adjacent columns running mediapipe on all the images
+
+- DESIGN MODEL
+1. Classifier model - as they did in the Kaggle notebook (these were trained on pixel images, but now we have coordinates)
+2. (optionally, try using the classification method for depthAI)
+
+- TRAIN MODEL
+1. Train classifier on the keypoint coordinate dataset
+
+- EVALUATE
+1. Run inference on still images
+2. Add result display to real time camera

@@ -1,0 +1,3 @@
+# test classifiers on still image dataset (against same training type)
+
+# NOTE: not sure if necesary file...

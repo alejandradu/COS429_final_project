@@ -9,34 +9,6 @@ from sklearn.preprocessing import LabelEncoder
 from PIL import Image, ImageOps
 import cv2
 
-def pad_image_to_array(image_path):
-    # Open the image
-    img = Image.open(image_path)
-    
-    # Calculate the padding to make the image 256x256
-    desired_size = 256
-    
-    ### replaced with library
-    # old_size = img.size  # old_size[0] is the width, old_size[1] is the height
-    
-    # # resize image to 256x256 but keep the aspect ratio
-    # ratio = float(desired_size) / max(old_size)
-    # new_size = tuple([int(x * ratio) for x in old_size])
-    # img = img.resize(new_size, Image.ANTIALIAS)
-    
-    # # Calculate the padding
-    # delta_w = desired_size - new_size[0]
-    # delta_h = desired_size - new_size[1]
-    # padding = (delta_w // 2, delta_h // 2, delta_w - (delta_w // 2), delta_h - (delta_h // 2))
-    
-    # # Create a new image with a white background
-    # new_img = ImageOps.expand(img, padding, fill='white')
-    
-    # pad the image
-    new_img = ImageOps.pad(image, (256,256))
-    
-    return np.array(new_img)
-
 def parse_image_folder(directory):
     """
     Extract valid images from a directory and return the standardized images and labels.

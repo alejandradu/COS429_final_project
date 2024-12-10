@@ -9,7 +9,7 @@ from sklearn.preprocessing import LabelEncoder
 from PIL import Image, ImageOps
 import cv2
 
-def parse_image_folder(directory):
+def parse_image_folder(directory, return_label_encoder=False):
     """
     Extract valid images from a directory and return the standardized images and labels.
 
@@ -61,6 +61,9 @@ def parse_image_folder(directory):
     # Encode labels - instead of using the poorly formatted json file
     label_encoder = LabelEncoder()
     labels = label_encoder.fit_transform(y)
+    
+    if return_label_encoder:
+        return X, labels, df, label_encoder
     
     return X, labels, df
 

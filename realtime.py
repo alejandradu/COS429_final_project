@@ -22,7 +22,7 @@ with open('/Users/alejandraduran/Documents/Pton_courses/COS429/COS429_final_proj
     label_encoder = pickle.load(f)
 
 # load the trained classifier
-with open('/Users/alejandraduran/Documents/Pton_courses/COS429/COS429_final_project/trained_classifiers/rf_pad.pkl', 'rb') as f:
+with open('/Users/alejandraduran/Documents/Pton_courses/COS429/COS429_final_project/trained_classifiers/PASTrandom_forest.pkl', 'rb') as f:
     classifier = pickle.load(f)
 
 # Open the webcam
@@ -38,8 +38,8 @@ while cap.isOpened():
     # timestamp = int(cap.get(cv2.CAP_PROP_POS_MSEC))
     timestamp = int(round(time.time()*1000))
     
-    # assess how different is it from 256 256??
-    print(np.shape(frame))
+    # shape is very different: 1080 by 1920
+    # print(np.shape(frame))
     
     if not ret:
         print("Error: Unable to fetch the frame.")
@@ -59,14 +59,7 @@ while cap.isOpened():
     # Draw landmarks if detected
     if landmarks is not None:  
         if len(landmarks.pose_landmarks) != 0:
-            # draw landmarks
-            # annotated_image = features_mp.draw_landmarks_on_image(frame, detection_result=landmarks) 
-            # formatted_landmark = features_mp.format_landmark(landmarks)
-            # # run inference
-            # predicted_class = classifier.predict(formatted_landmark)
-            # # get the string label
-            # predicted_name = label_encoder.inverse_transform(predicted_class-1)
-            # cv2.putText(frame, f'Predicted Class: {predicted_name}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+            
             pose_landmarks_list = landmarks.pose_landmarks
 
             # Loop through the detected poses to visualize.
@@ -75,14 +68,32 @@ while cap.isOpened():
 
                 # Draw the pose landmarks.
                 pose_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
-                pose_landmarks_proto.landmark.extend([
-                    landmark_pb2.NormalizedLandmark(x=landmark.x, y=landmark.y, z=landmark.z) for landmark in pose_landmarks
-                ])
+                to_extend = []
+                to_classify = np.zeros((1,features_mp.n_landmarks * 4))
+                
+                # store normalized landmarks to appends and classify
+                i = 0
+                for landmark in pose_landmarks:
+                    to_extend.append(landmark_pb2.NormalizedLandmark(x=landmark.x, y=landmark.y, z=landmark.z))
+                    to_classify[0, i:i+4] = [landmark.x, landmark.y, landmark.z, landmark.visibility]
+                    i += 4
+                
+                pose_landmarks_proto.landmark.extend(to_extend)
                 solutions.drawing_utils.draw_landmarks(
                     frame,
                     pose_landmarks_proto,
                     solutions.pose.POSE_CONNECTIONS,
                     solutions.drawing_styles.get_default_pose_landmarks_style())
+                
+            # Run inference
+            #if to_classify:
+            # input_x = np.array(to_classify)[0].reshape(1,-1)
+            print(to_classify.shape)
+            print(to_classify)
+            predicted_class = classifier.predict(to_classify)
+            # Get the string label
+            predicted_name = label_encoder.inverse_transform(predicted_class-1)
+            cv2.putText(frame, f'Predicted Class: {predicted_name[0]}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
             
     # Display the output
     cv2.imshow('Mediapipe, RF - Yoga Pose Detection', frame)

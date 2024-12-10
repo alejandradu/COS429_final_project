@@ -6,6 +6,21 @@ import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
+import tensorflow as tf
+import tensorflow_hub as hub
+from tensorflow_docs.vis import embed
+import numpy as np
+import cv2
+
+# Import matplotlib libraries
+from matplotlib import pyplot as plt
+from matplotlib.collections import LineCollection
+import matplotlib.patches as patches
+
+# Some modules to display an animation using imageio.
+import imageio
+from IPython.display import HTML, display
+
 # constants
 MP_N_LANDMARKS = 33
 MVNET_N_LANDMARKS = 17
@@ -95,6 +110,8 @@ def mediapipe_format_landmark(landmarker_result, encoded_label):
     # extract list of landmarks for 33 locations
     j = 0
     for landmark in landmark_list:
+        # if j == 1 or j == 2 or j == 3 or j == 4 or j == 5 or j == 6:
+        #     continue
         x = landmark.x
         y = landmark.y
         z = landmark.z

@@ -41,7 +41,7 @@ def parse_image_folder(directory):
     
     for i in range(len(df)):
         img = Image.open(df['path'][i])
-        img = img.resize((128, 128))  # Resize to 128x128
+        img = img.resize((256, 256))  # Resize to 128x128
         img = np.array(img)
         
         # Handle image formats

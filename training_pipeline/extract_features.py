@@ -6,9 +6,9 @@ import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
-import tensorflow as tf
-import tensorflow_hub as hub
-from tensorflow_docs.vis import embed
+# import tensorflow as tf
+# import tensorflow_hub as hub
+# from tensorflow_docs.vis import embed
 import numpy as np
 import cv2
 

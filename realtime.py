@@ -4,22 +4,22 @@ video stream using opencv"""
 import cv2
 import mediapipe as mp
 import pickle
-from training_pipeline.extract_features import *
+from training_pipeline.extract_features import FeaturesMP
 
 
-# Initialize MediaPipe PoseLandmarker
-mp_model_path = "../pretrained_models/pose_landmarker_heavy.task"
-# initialize listener object
-listener = MediapipeListener()
-# create detector in live stream mode
-detector = mediapipe_detector(mp_model_path, live_stream=True, listener=listener, min_pose_detection_confidence=0.7)
+# Retrieve pre-trained model
+mp_model_path = "pretrained_models/pose_landmarker_heavy.task"
+# Initialize FeaturesMP object
+features_mp = FeaturesMP(mp_model_path)
+# Initialize detector
+features_mp.init_detector(live_stream=True, min_pose_detection_confidence=0.7)
 # load the label encoder
 with open('/Users/alejandraduran/Documents/Pton_courses/COS429/COS429_final_project/training_pipeline/label_encoder.pkl', 'rb') as f:    
     label_encoder = pickle.load(f)
 
-# load the trained model
+# load the trained classifier
 with open('/Users/alejandraduran/Documents/Pton_courses/COS429/COS429_final_project/trained_classifiers/rf_pad.pkl', 'rb') as f:
-    model = pickle.load(f)
+    classifier = pickle.load(f)
 
 # Open the webcam
 cap = cv2.VideoCapture(0)
@@ -31,20 +31,17 @@ if not cap.isOpened():
 # Create a loop to read the latest frame from the camera
 while cap.isOpened():
     ret, frame = cap.read()
+    timestamp = int(cap.get(cv2.CAP_PROP_POS_MSEC))
+    
+    # assess how different is it from 256 256??
+    print(frame.shape)
     
     if not ret:
         print("Error: Unable to fetch the frame.")
         break
 
-    # Run inference on the image
-    mediapipe_detect(detector, frame, live_stream=True, frame_timestamp_ms=cap.CAP_PROP_POS_MSEC)
-    # results = pose.process(frame_rgb)
-    
-    # landmarks go to the listener
-    landmarks = listener.get()
-    
-    # assess how different is it from 256 256??
-    print(frame.shape)
+    # Run inference on the image - internally the listener returns the landmarks
+    landmarks = features_mp.detect(frame, live_stream=True, frame_timestamp_ms=timestamp)
     
     # if too different need a way to resize it after detection to match
     # the dimensions of normalized coordinates that we trained on
@@ -58,10 +55,10 @@ while cap.isOpened():
     if landmarks is not None:  
         if len(landmarks.pose_landmarks) != 0:
             # draw landmarks
-            annotated_image = draw_landmarks_on_image(frame, landmarks) 
-            formatted_landmark = mediapipe_format_landmark(landmarks)
+            annotated_image = features_mp.draw_landmarks_on_image(frame, landmarks) 
+            formatted_landmark = features_mp.format_landmark(landmarks)
             # run inference
-            predicted_class = model.predict(formatted_landmark)
+            predicted_class = classifier.predict(formatted_landmark)
             # get the string label
             predicted_name = label_encoder.inverse_transform(predicted_class-1)
             cv2.putText(frame, f'Predicted Class: {predicted_name}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)

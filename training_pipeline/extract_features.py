@@ -115,8 +115,6 @@ class FeaturesMP():
         # extract list of landmarks for 33 locations
         j = 0
         for landmark in landmark_list:
-            # if j == 1 or j == 2 or j == 3 or j == 4 or j == 5 or j == 6:
-            #     continue
             x = landmark.x
             y = landmark.y
             z = landmark.z

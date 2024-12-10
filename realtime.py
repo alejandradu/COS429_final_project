@@ -5,10 +5,14 @@ import cv2
 import mediapipe as mp
 import pickle
 from training_pipeline.extract_features import FeaturesMP
+import numpy as np
+import time
+from mediapipe import solutions
+from mediapipe.framework.formats import landmark_pb2
 
 
 # Retrieve pre-trained model
-mp_model_path = "pretrained_models/pose_landmarker_heavy.task"
+mp_model_path = "/Users/alejandraduran/Documents/Pton_courses/COS429/COS429_final_project/pretrained_models/pose_landmarker_full.task"
 # Initialize FeaturesMP object
 features_mp = FeaturesMP(mp_model_path)
 # Initialize detector
@@ -31,10 +35,11 @@ if not cap.isOpened():
 # Create a loop to read the latest frame from the camera
 while cap.isOpened():
     ret, frame = cap.read()
-    timestamp = int(cap.get(cv2.CAP_PROP_POS_MSEC))
+    # timestamp = int(cap.get(cv2.CAP_PROP_POS_MSEC))
+    timestamp = int(round(time.time()*1000))
     
     # assess how different is it from 256 256??
-    print(frame.shape)
+    print(np.shape(frame))
     
     if not ret:
         print("Error: Unable to fetch the frame.")
@@ -55,13 +60,29 @@ while cap.isOpened():
     if landmarks is not None:  
         if len(landmarks.pose_landmarks) != 0:
             # draw landmarks
-            annotated_image = features_mp.draw_landmarks_on_image(frame, landmarks) 
-            formatted_landmark = features_mp.format_landmark(landmarks)
-            # run inference
-            predicted_class = classifier.predict(formatted_landmark)
-            # get the string label
-            predicted_name = label_encoder.inverse_transform(predicted_class-1)
-            cv2.putText(frame, f'Predicted Class: {predicted_name}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+            # annotated_image = features_mp.draw_landmarks_on_image(frame, detection_result=landmarks) 
+            # formatted_landmark = features_mp.format_landmark(landmarks)
+            # # run inference
+            # predicted_class = classifier.predict(formatted_landmark)
+            # # get the string label
+            # predicted_name = label_encoder.inverse_transform(predicted_class-1)
+            # cv2.putText(frame, f'Predicted Class: {predicted_name}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+            pose_landmarks_list = landmarks.pose_landmarks
+
+            # Loop through the detected poses to visualize.
+            for idx in range(len(pose_landmarks_list)):
+                pose_landmarks = pose_landmarks_list[idx]
+
+                # Draw the pose landmarks.
+                pose_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
+                pose_landmarks_proto.landmark.extend([
+                    landmark_pb2.NormalizedLandmark(x=landmark.x, y=landmark.y, z=landmark.z) for landmark in pose_landmarks
+                ])
+                solutions.drawing_utils.draw_landmarks(
+                    frame,
+                    pose_landmarks_proto,
+                    solutions.pose.POSE_CONNECTIONS,
+                    solutions.drawing_styles.get_default_pose_landmarks_style())
             
     # Display the output
     cv2.imshow('Mediapipe, RF - Yoga Pose Detection', frame)

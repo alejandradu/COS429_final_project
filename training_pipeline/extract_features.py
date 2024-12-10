@@ -48,14 +48,14 @@ class FeaturesMP():
         # fine-tuning the model
         if video:
             options = PoseLandmarkerOptions(
-                base_options=BaseOptions(model_asset_path=model_path),
+                base_options=BaseOptions(model_asset_path=self.model_path),
                 running_mode=VisionRunningMode.VIDEO,
                 min_pose_detection_confidence=min_pose_detection_confidence,
                 min_tracking_confidence=min_tracking_confidence,
                 min_pose_presence_confidence=min_pose_presence_confidence)
         elif live_stream:
             options = PoseLandmarkerOptions(
-                base_options=BaseOptions(model_asset_path=model_path),
+                base_options=BaseOptions(model_asset_path=self.model_path),
                 running_mode=VisionRunningMode.LIVE_STREAM,
                 min_pose_detection_confidence=min_pose_detection_confidence,
                 min_tracking_confidence=min_tracking_confidence,
@@ -63,7 +63,7 @@ class FeaturesMP():
                 result_callback = self.live_view_listener)
         else:
             options = PoseLandmarkerOptions(
-                base_options=BaseOptions(model_asset_path=model_path),
+                base_options=BaseOptions(model_asset_path=self.model_path),
                 running_mode=VisionRunningMode.IMAGE,
                 min_pose_detection_confidence=min_pose_detection_confidence,
                 min_tracking_confidence=min_tracking_confidence,
@@ -123,7 +123,7 @@ class FeaturesMP():
             j += 1
         
         # flatten the array
-        X = X.reshape(1, MP_N_LANDMARKS * 4)
+        X = X.reshape(1, self.n_landmarks * 4)
             
         if encoded_label:
             # update the label to match accuracy function

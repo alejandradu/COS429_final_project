@@ -161,7 +161,6 @@ def mediapipe_format_landmark(landmarker_result, encoded_label=None):
     else:
         return X
 
-# from the Gemini API
 
 def draw_landmarks_on_image(rgb_image, detection_result=None, landmark_coords=None):
     """Can take in the landmark result object from MP detector or 

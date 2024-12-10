@@ -3,7 +3,6 @@ video stream using opencv"""
 
 import cv2
 import mediapipe as mp
-from utils import format_landmark
 import pickle
 from training_pipeline.extract_features import *
 

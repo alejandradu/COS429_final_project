@@ -8,6 +8,7 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from PIL import Image, ImageOps
 import cv2
+import json
 
 def parse_image_folder(directory, return_label_encoder=False):
     """
@@ -122,4 +123,4 @@ def parse_video_folder(directory):
     y = label_encoder.fit_transform(y)
     
     return X, y, df
-            
+    

@@ -24,6 +24,10 @@ with open('/Users/alejandraduran/Documents/Pton_courses/COS429/COS429_final_proj
 # load the trained classifier
 with open('/Users/alejandraduran/Documents/Pton_courses/COS429/COS429_final_project/trained_classifiers/PASTrandom_forest.pkl', 'rb') as f:
     classifier = pickle.load(f)
+    
+# load the sanskrit to english dictionary
+with open('/Users/alejandraduran/Documents/Pton_courses/COS429/COS429_final_project/sanskrit_english_dict.pkl', 'rb') as f:
+    sanskrit_english_dict = pickle.load(f)
 
 # Open the webcam
 cap = cv2.VideoCapture(0)
@@ -88,12 +92,28 @@ while cap.isOpened():
             # Run inference
             #if to_classify:
             # input_x = np.array(to_classify)[0].reshape(1,-1)
-            print(to_classify.shape)
-            print(to_classify)
             predicted_class = classifier.predict(to_classify)
             # Get the string label
-            predicted_name = label_encoder.inverse_transform(predicted_class-1)
-            cv2.putText(frame, f'Predicted Class: {predicted_name[0]}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+            predicted_name = label_encoder.inverse_transform([int(predicted_class-1)])
+            text = sanskrit_english_dict[predicted_name[0]]
+            print(text)
+            
+            # Define text properties
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            font_scale = 4
+            font_thickness = 2
+            text_color = (255, 255, 255)  # White color
+            bg_color = (0, 0, 0)  # Black color for background rectangle
+            bg_opacity = 0.6  # Background opacity
+
+            # Get text size
+            (text_width, text_height), baseline = cv2.getTextSize(text, font, font_scale, font_thickness)
+            text_offset_x, text_offset_y = 10, 30
+            box_coords = ((text_offset_x, text_offset_y), (text_offset_x + text_width, text_offset_y - text_height - baseline))
+
+            # Put text on the frame
+            cv2.putText(frame, text, (text_offset_x, text_offset_y - baseline), font, font_scale, text_color, font_thickness, cv2.LINE_AA)
+            
             
     # Display the output
     cv2.imshow('Mediapipe, RF - Yoga Pose Detection', frame)

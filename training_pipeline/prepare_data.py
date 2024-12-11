@@ -43,8 +43,6 @@ def parse_image_folder(directory, return_label_encoder=False):
     
     for i in range(len(df)):
         img = Image.open(df['path'][i])
-        # img = img.resize((256, 256))  # Resize to 128x128
-        # img = np.array(img)
         new_img = ImageOps.pad(img, (256,256))
         img = np.array(new_img)
         
@@ -125,12 +123,3 @@ def parse_video_folder(directory):
     
     return X, y, df
     
-def get_english_name(sanskrit_name, english_dict):
-# Strip any leading or trailing whitespace from the input
-    sanskrit_name = sanskrit_name.strip()
-    # Iterate through the dictionary to find the matching sanskrit_name
-    for key in english_dict.keys():
-        if key.strip() == sanskrit_name:
-            return english_dict[key]
-    # Return None if the sanskrit_name is not found
-    return "NEW POSE!"

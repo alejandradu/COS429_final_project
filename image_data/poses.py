@@ -46,9 +46,9 @@ sanskrit_english_dict = {
     "Ashta Chandrasana": "High Lunge",
     "Camatkarasana": "Wild Thing",
     "Trikonasana": "Triangle",
-    "Upavishta Konasana": "Wide-Angle Seated Forward Bend",
-    "Urdhva Mukha Svanasana": "Upward-Facing Dog",
-    "Urdvha Dhanurasana": "Wheel",
+    "Upavistha Konasana": "Wide-Angle Seated Forward Bend",
+    "Urdhva Mukha Svsnssana": "Upward-Facing Dog",  # original spelling: Svasana
+    "Urdhva Dhanurasana": "Wheel",
     "Vrksasana": "Tree",}
 
 # save the dict

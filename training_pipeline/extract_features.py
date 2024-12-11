@@ -231,12 +231,12 @@ class FeaturesMP():
             X[:, 1] = X[:, 1] * self.height/square_size
             X[:, 2] = X[:, 2] * self.width/square_size
             
-        # origin is landmark 12 (right shoulder)
-        origin = X[12, 0:3]
+        # origin is landmark 24 (right hip)
+        origin = X[24, 0:3]
         # translate all landmarks to new origin
         X[:, 0:3] = X[:, 0:3] - origin
-        # get angle of vector between landmark 12 and 24 (right hip) 
-        vector = X[24, 0:3]
+        # get angle of vector between landmark 11 (right shoulder)
+        vector = X[11, 0:3]
         angle1 = np.arctan2(vector[1], vector[0])
         angle2 = np.arctan2(vector[2], vector[0])
         # Rotation matrix around the x-axis

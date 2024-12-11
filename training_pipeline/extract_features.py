@@ -99,7 +99,7 @@ class FeaturesMP():
             self.detector_classifier = PoseLandmarker.create_from_options(options)
 
 
-    def detect(self, frame, video=False, video_fps=30, live_stream=False, frame_timestamp_ms=0, double=False):
+    def detect(self, frame, video=False, live_stream=False, frame_timestamp_ms=0, double=False):
         """frame must be a numpy array from OpenCV, corresponding to an RGB image"""
         # NOTE: guarantee this for video/livestream?? (already for images)
         # Load the frame rate of the video using OpenCV’s CV_CAP_PROP_FPS
@@ -117,7 +117,7 @@ class FeaturesMP():
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
         
         if video:
-            return self.detector.detect_for_video(mp_image, video_fps)
+            return self.detector.detect_for_video(mp_image, frame_timestamp_ms)
         
         elif live_stream:
             if double:

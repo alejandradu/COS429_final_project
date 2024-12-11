@@ -67,9 +67,9 @@ def parse_image_folder(directory, return_label_encoder=False):
     
     return X, labels, df
 
+
 def parse_video_folder(directory):
     """
-    TODO: REVISE THIS FUNCTION DONE BY COPILOT
     Extract valid videos from a directory and return the standardized videos and labels.
 
     Args:
@@ -99,23 +99,24 @@ def parse_video_folder(directory):
     label = pd.Series(label, name='label')
     df = pd.concat([video_path, label], axis=1)
     
-    for i in range(len(df)):
-        cap = cv2.VideoCapture(df['path'][i])
-        if not cap.isOpened():
-            print(f"Error: Cannot access the video {df['path'][i]}.")
-            continue
+    # don't think we want to pre-feed frames
+    # for i in range(len(df)):
+    #     cap = cv2.VideoCapture(df['path'][i])
+    #     if not cap.isOpened():
+    #         print(f"Error: Cannot access the video {df['path'][i]}.")
+    #         continue
         
-        while cap.isOpened():
-            ret, frame = cap.read()
-            if not ret:
-                print(f"Error: Unable to fetch the frame from video {df['path'][i]}.")
-                break
+    #     while cap.isOpened():
+    #         ret, frame = cap.read()
+    #         if not ret:
+    #             print(f"Error: Unable to fetch the frame from video {df['path'][i]}.")
+    #             break
             
-            frame = cv2.resize(frame, (128, 128))
-            X.append(frame)
-            y.append(df['label'][i])
+    #         frame = cv2.resize(frame, (128, 128))
+    #         X.append(frame)
+    #         y.append(df['label'][i])
             
-        cap.release()
+    #     cap.release()
         
     # Encode labels - instead of using the poorly formatted json file
     label_encoder = LabelEncoder()

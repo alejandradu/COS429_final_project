@@ -85,7 +85,7 @@ while cap.isOpened():
                 to_classify[k] = [landmark.x, landmark.y, landmark.z, landmark.visibility]
                 
             # normalize and rotate to_classify
-            to_classify = features_mp.make_rot_invariant(to_classify, init_norm=True)
+            to_classify = features_mp.make_rot_invariant_full(to_classify, init_norm=True)
             to_classify = to_classify.reshape(1, features_mp.n_landmarks * 4)
             
             # draw real-time landmarks

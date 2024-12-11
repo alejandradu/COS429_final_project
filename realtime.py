@@ -21,7 +21,7 @@ with open('/Users/alejandraduran/Documents/Pton_courses/COS429/COS429_final_proj
     label_encoder = pickle.load(f)
 
 # load the trained classifier
-with open('/Users/alejandraduran/Documents/Pton_courses/COS429/COS429_final_project/trained_classifiers/padded_nn_5.pkl', 'rb') as f:
+with open('/Users/alejandraduran/Documents/Pton_courses/COS429/COS429_final_project/trained_classifiers/padded_nn_7.pkl', 'rb') as f:
     classifier = pickle.load(f)
     
 # load the sanskrit to english dictionary
@@ -29,7 +29,7 @@ with open('/Users/alejandraduran/Documents/Pton_courses/COS429/COS429_final_proj
     sanskrit_english_dict = pickle.load(f)
     
 # introduce delay in position predictions
-buffer = [-1,-1,-1]
+buffer = [-1,-1,-1,-1]
 
 # Define text properties
 font = cv2.FONT_HERSHEY_SIMPLEX
@@ -57,20 +57,21 @@ while cap.isOpened():
         print("Error: Unable to fetch the frame.")
         break
 
-    # Run inference on the image - internally the listener returns the landmarks
-    #landmarks_draw, landmarks = features_mp.detect(frame, live_stream=True, frame_timestamp_ms=timestamp, double=True)
+    # Run inference on the image 
+    # uncomment if double: landmarks_draw, landmarks = features_mp.detect(frame, live_stream=True, frame_timestamp_ms=timestamp, double=True)
     landmarks = features_mp.detect(frame, live_stream=True, frame_timestamp_ms=timestamp)
     
     # Draw landmarks if detected
-    if landmarks is not None:# and landmarks_draw is not None:  
-        if len(landmarks.pose_landmarks) != 0:# and len(landmarks_draw.pose_landmarks) != 0:
+    if landmarks is not None: # uncomment if double: and landmarks_draw is not None:  
+        if len(landmarks.pose_landmarks) != 0: # uncomment if double: and len(landmarks_draw.pose_landmarks) != 0:
             
-            pose_landmarks_list = landmarks.pose_landmarks  # returns normalized w respect to hip center
-            #pose_landmarks_draw_list = landmarks_draw.pose_landmarks
+            pose_landmarks_list = landmarks.pose_landmarks 
+            # uncomment if double: pose_landmarks_draw_list = landmarks_draw.pose_landmarks
 
-            # NOT loop - normalized is enough, better for latency
+            # get only normalized coordinates - improves latency
             pose_landmarks = pose_landmarks_list[0]
-            #pose_landmarks_draw = pose_landmarks_draw_list[0]
+            # uncomment if double: pose_landmarks_draw = pose_landmarks_draw_list[0]
+            
             # Draw the pose landmarks.
             pose_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
             to_classify = np.zeros((features_mp.n_landmarks, 4))
@@ -78,23 +79,10 @@ while cap.isOpened():
             
             # store normalized landmarks to appends and classify
             for k, landmark in enumerate(pose_landmarks):
-                # to_extend.append(landmark_pb2.NormalizedLandmark(x=pose_landmarks_draw[k].x,
-                #                                                  y=pose_landmarks_draw[k].y, 
-                #                                                  z=pose_landmarks_draw[k].z))
-                to_extend.append(landmark_pb2.NormalizedLandmark(x=landmark.x,
-                                                                 y=landmark.y, 
-                                                                 z=landmark.z))
-                # # store the origin - will always store
-                # if k == 0:
-                #     origin_coord = landmark
-                # # store the first landmark for angle
-                # if k == 1:
-                #     angle_coord = landmark
-                
+                # uncomment if double: to_extend.append(landmark_pb2.NormalizedLandmark(x=pose_landmarks_draw[k].x, y=pose_landmarks_draw[k].y, z=pose_landmarks_draw[k].z))
+                to_extend.append(landmark_pb2.NormalizedLandmark(x=landmark.x,y=landmark.y, z=landmark.z))
                 # store in an array
                 to_classify[k] = [landmark.x, landmark.y, landmark.z, landmark.visibility]
-                # to_classify[0, i:i+4] = features_mp.renormalize_landmark(landmark, origin_coord, angle_coord)#[landmark.x, landmark.y, landmark.z, landmark.visibility]
-                # i += 4
                 
             # normalize and rotate to_classify
             to_classify = features_mp.make_rot_invariant(to_classify, init_norm=True)
@@ -116,7 +104,7 @@ while cap.isOpened():
             buffer.pop(0)
             buffer.append(predicted_name[0])
             # # if all elements now in the buffer are the same, then we can display the pose
-            if buffer[0] == buffer[1] == buffer[2]:
+            if buffer[0] == buffer[1] == buffer[2] == buffer[3]:
                 text = sanskrit_english_dict[predicted_name[0]]
 
             cv2.putText(frame, text, coords, font, font_scale, text_color, font_thickness, cv2.LINE_AA)

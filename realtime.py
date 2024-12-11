@@ -22,7 +22,7 @@ with open('/Users/alejandraduran/Documents/Pton_courses/COS429/COS429_final_proj
     label_encoder = pickle.load(f)
 
 # load the trained classifier
-with open('/Users/alejandraduran/Documents/Pton_courses/COS429/COS429_final_project/trained_classifiers/padded_nn.pkl', 'rb') as f:
+with open('/Users/alejandraduran/Documents/Pton_courses/COS429/COS429_final_project/trained_classifiers/padded_nn_5.pkl', 'rb') as f:
     classifier = pickle.load(f)
     
 # load the sanskrit to english dictionary

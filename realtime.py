@@ -9,7 +9,7 @@ import numpy as np
 import time
 from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
-
+from training_pipeline.prepare_data import get_english_name
 
 # Retrieve pre-trained model
 mp_model_path = "/Users/alejandraduran/Documents/Pton_courses/COS429/COS429_final_project/pretrained_models/pose_landmarker_full.task"
@@ -22,7 +22,7 @@ with open('/Users/alejandraduran/Documents/Pton_courses/COS429/COS429_final_proj
     label_encoder = pickle.load(f)
 
 # load the trained classifier
-with open('/Users/alejandraduran/Documents/Pton_courses/COS429/COS429_final_project/trained_classifiers/PASTrandom_forest.pkl', 'rb') as f:
+with open('/Users/alejandraduran/Documents/Pton_courses/COS429/COS429_final_project/trained_classifiers/padded_nn.pkl', 'rb') as f:
     classifier = pickle.load(f)
     
 # load the sanskrit to english dictionary
@@ -95,12 +95,11 @@ while cap.isOpened():
             predicted_class = classifier.predict(to_classify)
             # Get the string label
             predicted_name = label_encoder.inverse_transform([int(predicted_class-1)])
-            text = sanskrit_english_dict[predicted_name[0]]
-            print(text)
+            text = get_english_name(predicted_name[0], sanskrit_english_dict)
             
             # Define text properties
             font = cv2.FONT_HERSHEY_SIMPLEX
-            font_scale = 4
+            font_scale = 1
             font_thickness = 2
             text_color = (255, 255, 255)  # White color
             bg_color = (0, 0, 0)  # Black color for background rectangle

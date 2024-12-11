@@ -10,6 +10,7 @@ from PIL import Image, ImageOps
 import cv2
 import json
 
+
 def parse_image_folder(directory, return_label_encoder=False):
     """
     Extract valid images from a directory and return the standardized images and labels.
@@ -124,3 +125,12 @@ def parse_video_folder(directory):
     
     return X, y, df
     
+def get_english_name(sanskrit_name, english_dict):
+# Strip any leading or trailing whitespace from the input
+    sanskrit_name = sanskrit_name.strip()
+    # Iterate through the dictionary to find the matching sanskrit_name
+    for key in english_dict.keys():
+        if key.strip() == sanskrit_name:
+            return english_dict[key]
+    # Return None if the sanskrit_name is not found
+    return "NEW POSE!"

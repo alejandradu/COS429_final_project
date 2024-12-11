@@ -36,7 +36,6 @@ class FeaturesMP():
         self.pad_width_right = max(0, self.desired_length - self.width - self.pad_width_left)
         self.padding = ((self.pad_height_top, self.pad_height_bottom), (self.pad_width_left, self.pad_width_right), (0, 0))
         
-        
     # Follows the OutputListener interface in mp
     # Way to retrieve detection results asynchronously - reduces latency
     def live_view_listener(self, result: mp.tasks.vision.PoseLandmarkerResult, output_image: mp.Image, timestamp_ms: int):
@@ -162,7 +161,7 @@ class FeaturesMP():
             j += 1
             
         if rot_invariant:
-            X = self.make_rot_invariant(X)
+            X = self.make_rot_invariant_full(X)
 
         # flatten the array
         X = X.reshape(1, self.n_landmarks * 4)
@@ -217,7 +216,7 @@ class FeaturesMP():
         return annotated_image
     
             
-    def make_rot_invariant(self, landmark_array, init_norm=False):
+    def make_rot_invariant_partial(self, landmark_array, init_norm=False):
         # landmark_array is a np.array with landmarks as rows and coords + visibility as columns for a single pose
         # of shape n_landmarks x 4
         # init_norm if you want to renormalize like a square before rotating
@@ -232,12 +231,12 @@ class FeaturesMP():
             X[:, 1] = X[:, 1] * self.height/square_size
             X[:, 2] = X[:, 2] * self.width/square_size
             
-        # origin is landmark 24
-        origin = X[24, 0:3]
+        # origin is landmark 12 (right shoulder)
+        origin = X[12, 0:3]
         # translate all landmarks to new origin
         X[:, 0:3] = X[:, 0:3] - origin
-        # get angle of vector between landmark 24 and 11 (shoulder) - likely to always be there
-        vector = X[11, 0:3]
+        # get angle of vector between landmark 12 and 24 (right hip) 
+        vector = X[24, 0:3]
         angle1 = np.arctan2(vector[1], vector[0])
         angle2 = np.arctan2(vector[2], vector[0])
         # Rotation matrix around the x-axis
@@ -252,9 +251,40 @@ class FeaturesMP():
             [0, 1, 0],
             [-np.sin(-angle2), 0, np.cos(-angle2)]
         ])
+        
         # Combine the rotations
         rotation_matrix = np.dot(rotation_matrix_y, rotation_matrix_x)
         # Apply the rotation to all landmarks
         X[:, 0:3] = np.dot(X[:, 0:3], rotation_matrix)
+        
+        return X
+    
+    def make_rot_invariant_full(self, landmark_array, init_norm=False):
+        X = np.copy(landmark_array)
+        
+        if init_norm:
+            square_size = max(self.height, self.width)
+            # normalize as if in a square picture
+            X[:, 0] = X[:, 0] * self.width/square_size
+            X[:, 1] = X[:, 1] * self.height/square_size
+            X[:, 2] = X[:, 2] * self.width/square_size
+            
+        # origin is landmark 12 (right shoulder)
+        origin = X[12, 0:3]
+        # translate all landmarks to new origin
+        X[:, 0:3] = X[:, 0:3] - origin
+        
+        # new x axis is the vector between 12 and 24
+        x_axis = X[24, 0:3]
+        # new y axis is the vector between 12 and 11
+        y_axis = X[11, 0:3]
+        # z axis is the cross product
+        z_axis = np.cross(x_axis, y_axis)
+        
+        # change of basis matrix has columns as new axes
+        change_of_basis = np.column_stack((x_axis, y_axis, z_axis))
+        
+        # apply transformation to all landmarks
+        X[:, 0:3] = np.dot(X[:, 0:3], change_of_basis)
         
         return X

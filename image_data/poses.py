@@ -22,7 +22,6 @@ sanskrit_english_dict = {
     "Pincha Mayurasana": "Forearm Stand",
     "Ardha Chandrasana": "Half-Moon",
     "Adho Mukha Vrksasana": "Handstand",
-    "Adho Mukha Svanasana": "Downward-facing dog",
     "Anjaneyasana": "Low Lunge",
     "Supta Kapotasana": "Pigeon",
     "Eka Pada Rajakapotasana": "King Pigeon",

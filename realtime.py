@@ -21,7 +21,7 @@ with open('/Users/alejandraduran/Documents/Pton_courses/COS429/COS429_final_proj
     label_encoder = pickle.load(f)
 
 # load the trained classifier
-with open('/Users/alejandraduran/Documents/Pton_courses/COS429/COS429_final_project/trained_classifiers/padded_nn_7.pkl', 'rb') as f:
+with open('/Users/alejandraduran/Documents/Pton_courses/COS429/COS429_final_project/trained_classifiers/padded_nn_5.pkl', 'rb') as f:
     classifier = pickle.load(f)
     
 # load the sanskrit to english dictionary
@@ -29,13 +29,13 @@ with open('/Users/alejandraduran/Documents/Pton_courses/COS429/COS429_final_proj
     sanskrit_english_dict = pickle.load(f)
     
 # introduce delay in position predictions
-buffer = [-1,-1,-1,-1]
+buffer = [-1,-1]
 
 # Define text properties
 font = cv2.FONT_HERSHEY_SIMPLEX
 font_scale = 3
 font_thickness = 4
-text_color = (255, 255, 255)  # White color
+text_color = (0,0,0)  # black color
 bg_color = (0, 0, 0)  # Black color for background rectangle
 bg_opacity = 0.6  # Background opacity
 coords = (50, 100)  # Coordinates to display the text
@@ -85,7 +85,7 @@ while cap.isOpened():
                 to_classify[k] = [landmark.x, landmark.y, landmark.z, landmark.visibility]
                 
             # normalize and rotate to_classify
-            to_classify = features_mp.make_rot_invariant_full(to_classify, init_norm=True)
+            #to_classify = features_mp.make_rot_invariant_full(to_classify, init_norm=True)
             to_classify = to_classify.reshape(1, features_mp.n_landmarks * 4)
             
             # draw real-time landmarks
@@ -104,7 +104,7 @@ while cap.isOpened():
             buffer.pop(0)
             buffer.append(predicted_name[0])
             # # if all elements now in the buffer are the same, then we can display the pose
-            if buffer[0] == buffer[1] == buffer[2] == buffer[3]:
+            if buffer[0] == buffer[1]:
                 text = sanskrit_english_dict[predicted_name[0]]
 
             cv2.putText(frame, text, coords, font, font_scale, text_color, font_thickness, cv2.LINE_AA)

@@ -223,9 +223,12 @@ class FeaturesMP():
         return annotated_image
 
 
-    def draw_3d_landmarks(self, detection_results, rot_inv_simple=False, rot_inv_full=False):
+    def draw_3d_landmarks(self, detection_results, world=False):
         """Draw the 3D landmarks connected in a 3D axis space"""
-        pose_landmarks_list = detection_results.pose_landmarks
+        if world:
+            pose_landmarks_list = detection_results.pose_world_landmarks
+        else:
+            pose_landmarks_list = detection_results.pose_landmarks
         
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')

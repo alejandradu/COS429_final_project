@@ -6,6 +6,10 @@ from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
 import cv2
 from PIL import Image, ImageOps
+import pandas as pd
+import plotly.graph_objects as go
+from mpl_toolkits.mplot3d import Axes3D
+from mediapipe.python.solutions import pose as mp_pose
 
 # Import matplotlib libraries
 from matplotlib import pyplot as plt
@@ -197,6 +201,9 @@ class FeaturesMP():
             solutions.drawing_styles.get_default_pose_landmarks_style())
             return annotated_image
         
+        if detection_result is None:
+            return annotated_image
+        
         pose_landmarks_list = detection_result.pose_landmarks
 
         # Loop through the detected poses to visualize.
@@ -214,6 +221,45 @@ class FeaturesMP():
             solutions.drawing_styles.get_default_pose_landmarks_style())
             
         return annotated_image
+
+
+    def draw_3d_landmarks(self, detection_results, rot_inv_simple=False, rot_inv_full=False):
+        """Draw the 3D landmarks connected in a 3D axis space"""
+        pose_landmarks_list = detection_results.pose_landmarks
+        
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        
+        # Loop through the detected poses to visualize.
+        for idx in range(len(pose_landmarks_list)):
+            pose_landmarks = pose_landmarks_list[idx] 
+            # Draw the pose landmarks.
+            pose_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
+            pose_landmarks_proto.landmark.extend([
+                landmark_pb2.NormalizedLandmark(x=landmark.x, y=landmark.y, z=landmark.z) for landmark in pose_landmarks
+            ])
+            
+            # Extract x, y, z coordinates for plotting
+            xs = [landmark.x for landmark in pose_landmarks_proto.landmark]
+            ys = [landmark.y for landmark in pose_landmarks_proto.landmark]
+            zs = [landmark.z for landmark in pose_landmarks_proto.landmark]
+            
+            # Plot the landmarks
+            ax.scatter(xs, ys, zs, c='r', marker='o')
+            
+            # Draw the connections
+            connections = mp_pose.POSE_CONNECTIONS
+            for connection in connections:
+                # Get the landmarks at the start and end of the connection.
+                start = pose_landmarks_proto.landmark[connection[0]]
+                end = pose_landmarks_proto.landmark[connection[1]]
+                # Draw a line between the two landmarks.
+                ax.plot([start.x, end.x], [start.y, end.y], [start.z, end.z], color='black')
+        
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.set_zlabel('Z')
+        plt.show()
     
             
     def make_rot_invariant_partial(self, landmark_array, init_norm=False):
